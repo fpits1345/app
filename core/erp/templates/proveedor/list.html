@@ -1,0 +1,74 @@
+{% extends 'list.html' %}
+{% load static %}
+{% block head_list %}
+    <script src="{% static 'proveedor/js/list.js' %}"></script>
+{% endblock %}
+
+
+
+{% block content %}
+
+<div class="card card-primary">
+
+    <div class="card-header">
+        <style>
+            .card-header{
+              background: #000f2e !important;
+            }
+       </style>
+    
+        <h3 class="card-title">
+            <i class="fas fa-search"></i>
+            {{ title }}
+        
+
+        </h3>
+        <a href="{% url 'erp:conformidad_list' %}" class="btn btn-success btn-flat" style="float: right; border-radius: 10px; background-color: #000f2e; color: white;border: 1px solid white;">
+            <i class="fas fa-plus"></i> Ver Conformidades
+        </a>
+    </div>
+    <div class="card-body">
+        <table class="table table-bordered" id="data">
+            <thead>
+            {% block columns %}
+
+            <tr>
+                <th scope="col" style="width: 10%;">Rut</th>
+                <th scope="col" style="width: 15%;">Razón Social</th>
+                <th scope="col" style="width: 15%;">Pagina Web</th>
+                <th scope="col" style="width: 15%;">Correo</th>
+                <th scope="col" style="width: 10%;">Opciones</th>
+            </tr>
+
+            {% endblock %}
+            </thead>
+            <tbody>
+            {% block rows %}
+
+            {% endblock %}
+            </tbody>
+        </table>
+    </div>
+    <div class="card-footer">
+        {% block buttons_list %}
+            <a href="{{ create_url }}" class="btn btn-primary btn-flat btnTest">
+                <i class="fas fa-plus"></i> Nuevo registro
+            </a>
+            <a href="{{ list_url }}" class="btn btn-success btn-flat">
+                <i class="fas fa-sync"></i> Actualizar
+            </a>
+        {% endblock %}
+    </div>
+</div>
+
+
+
+{% endblock content %}
+
+    
+
+
+
+{% block javascript %}
+
+{% endblock %}

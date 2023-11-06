@@ -1,0 +1,342 @@
+{% extends 'layout.html' %}
+{% load static %}
+
+{% block head %}
+
+<script src="{% static 'lib/highcharts-8.1.2/highcharts.js' %}"></script>
+<script src="{% static 'lib/highcharts-8.1.2/modules/exporting.js' %}"></script>
+<script src="{% static 'lib/highcharts-8.1.2/modules/export-data.js' %}"></script>
+<script src="{% static 'lib/highcharts-8.1.2/modules/accessibility.js' %}"></script>
+
+{% endblock head %}
+
+
+{% block content %}
+
+<div class="container-fluid">
+
+    <div class="row">
+        <div class="col-12 col-sm-6 col-md-3">
+            <div class="info-box">
+                <span class="info-box-icon bg-success elevation-1"><i class="fas fa-cubes"></i></span>
+                <div class="info-box-content">
+                    <span class="info-box-text">Stock Alto</span>
+                    <span class="info-box-number">{{ normal_products.count }}</span>
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="col-12 col-sm-6 col-md-3">
+            <div class="info-box mb-3">
+                <span class="info-box-icon bg-warning elevation-1"><i class="fas fa-cube"></i></span>
+                <div class="info-box-content">
+                    <span class="info-box-text">Stock Medio</span>
+                    <span class="info-box-number">{{ medium_products.count }}</span>
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="col-sm-3 col-6">
+            <div class="description-block border-right">
+                <span class="description-percentage text-danger"><i class="fas fa-caret-down"></i> {{ stock_greater_than_zero_percentage }}%</span>
+                <br>
+                <span class="description-text">Productos en Bodega</span>
+            </div>
+
+        </div>
+
+        <div class="col-sm-3 col-6">
+            <div class="description-block">
+                <span class="description-percentage text-success"><i class="fas fa-caret-up"></i> {{ zero_stock_percentage }}%</span>
+                <br>
+                <span class="description-text">Productos en Servicio</span>
+            </div>
+        </div>
+        <div class="col-12 col-sm-6 col-md-3">
+            <div class="info-box mb-3">
+                <span class="info-box-icon bg-danger elevation-1"><i class="fas fa-exclamation-triangle"></i></span>
+                <div class="info-box-content">
+                    <span class="info-box-text">Stock Crítico</span>
+                    <span class="info-box-number">{{ critical_products.count }}</span>
+                </div>
+
+            </div>
+
+        </div>
+
+
+        
+
+    </div>
+
+
+
+
+    <!-- contenedor de grafico de barras-->
+    <div class="container-fluid">
+
+        <div class="row">
+            <div class="card col-md-4">
+                <div class="card-header">
+                    <h3 class="card-title">Top 5 Proveedores</h3>
+                </div>
+    
+                <div class="card-body p-0">
+                    <ul class="list-group">
+                        {% for provider in top_providers_with_conformities %}
+                        <li class="list-group-item">
+                            <strong>{{ provider.razon_social }}</strong>
+                            <span class="badge badge-primary badge-pill">{{ provider.conformity_count }}
+                                conformidades</span>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+            <hr>
+            <div class="card col-lg-7">
+                <div id="container"></div>
+            </div>
+            <div class="card col-md-4">
+                <div class="card-header">
+                    <h3 class="card-title">Top Productos Vendidos</h3>
+                </div>
+    
+                <div class="card-body p-0">
+                    <table class="table table-striped" style="width: 100%;">
+                        <thead>
+                            <tr>
+                                <th style="width: 10px">#</th>
+                                <th>Producto</th>
+                                <th>Vendidos</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for product in top_products %}
+                            <tr>
+                                <td>{{ forloop.counter }}.</td>
+                                <td>{{ product.name }}</td>
+                                <td>
+                                    <div class="progress progress-xs">
+                                        <div class="progress-bar bg-primary" style="width: {{ product.total_sales }}%">
+                                        </div>
+                                    </div>
+                                    <span class="badge bg-primary">{{ product.total_sales }}</span>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <hr>
+            <div class="card col-lg-7">
+                <div id="container-pie"></div>
+            </div>
+
+        </div>
+    </div>
+
+
+    <br>
+
+
+</div>
+
+
+
+<script type="application/javascript">
+
+
+    var graphcolumn = Highcharts.chart('container', {
+        chart: {
+            type: 'column'
+        },
+        title: {
+            text: 'Reporte de ventas del año',
+            align: 'left'
+        },
+        subtitle: {
+            text: 'Reporte de columnas',
+            align: 'left'
+        },
+        xAxis: {
+            categories: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
+            crosshair: true,
+            accessibility: {
+                description: 'Countries'
+            }
+        },
+        yAxis: {
+            min: 0,
+            title: {
+                text: 'Valores'
+            }
+        },
+        tooltip: {
+            valueSuffix: ' $'
+        },
+        plotOptions: {
+            column: {
+                pointPadding: 0.2,
+                borderWidth: 0
+            }
+        },
+
+
+
+    });
+
+
+
+    var graphpie = Highcharts.chart('container-pie', {
+        chart: {
+            plotBackgroundColor: null,
+            plotBorderWidth: null,
+            plotShadow: false,
+            type: 'pie'
+        },
+        title: {
+            text: 'salidas Por tipo de productos',
+            align: 'left'
+        },
+        tooltip: {
+            pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+        },
+        accessibility: {
+            point: {
+                valueSuffix: '%'
+            }
+        },
+        plotOptions: {
+            pie: {
+                allowPointSelect: true,
+                cursor: 'pointer',
+                dataLabels: {
+                    enabled: true,
+                    format: '<b>{point.name}</b>: {point.percentage:.1f} %'
+                }
+            }
+        },
+
+    });
+
+
+
+
+    function get_graph_sales_year_month() {
+        $.ajax({
+            url: window.location.pathname,
+            type: 'POST',
+            data: {
+                'action': 'get_graph_sales_year_month'
+            },
+            dataType: 'json',
+        }).done(function (data) {
+            console.log(data);
+            if (!data.hasOwnProperty('error')) {
+                graphcolumn.addSeries({
+                    name: 'Porcentaje de ventas',
+                    showInLegend: false,
+                    colorByPoint: true,
+                    data: data
+
+                });
+                return false;
+            }
+            message_error(data.error);
+        }).fail(function (jqXHR, textStatus, errorThrown) {
+            alert(textStatus + ': ' + errorThrown);
+        }).always(function (data) {
+
+        });
+
+    };
+
+
+
+    function get_graph_mov_products() {
+        $.ajax({
+            url: window.location.pathname,
+            type: 'POST',
+            data: {
+                'action': 'get_graph_mov_products'
+            },
+            dataType: 'json',
+        }).done(function (data) {
+            console.log(data);
+            if (!data.hasOwnProperty('error')) {
+                graphpie.addSeries({
+                    name: 'Porcentaje',
+                    colorByPoint: true,
+                    data: data
+
+                });
+                return false;
+            }
+            message_error(data.error);
+        }).fail(function (jqXHR, textStatus, errorThrown) {
+            alert(textStatus + ': ' + errorThrown);
+        }).always(function (data) {
+
+        });
+
+    };
+
+
+    $(function () {
+
+        get_graph_sales_year_month();
+        get_graph_mov_products();
+
+
+
+
+    });
+
+
+</script>
+
+
+
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Meses</th>
+            <th>Tipo de Movimiento</th>
+            <th>Cantidad</th>
+            <th>Porcentaje (%)</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for month_data in movement_percentage_by_month %}
+        <tr>
+            <td>{{ month_data.month_name }}</td>
+            <td>
+                {% for item in month_data.data %}
+                {{ item.tipo__name }}{% if not forloop.last %}| {% endif %}
+                {% endfor %}
+            </td>
+            <td>
+                {% for item in month_data.data %}
+                {{ item.count }}{% if not forloop.last %}| {% endif %}
+                {% endfor %}
+            </td>
+            <td>
+                {% for item in month_data.data %}
+                {{ item.percentage|default:0|floatformat:2 }}{% if not forloop.last %}| {% endif %}
+                {% endfor %}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+
+{% endblock content %}
