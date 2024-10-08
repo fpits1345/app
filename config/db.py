@@ -8,11 +8,11 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 POSTGRESQL = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'pruebax',
-        'USER': 'yo',
-        'PASSWORD': '123',
+        'NAME': 'mapa',
+        'USER': 'userpueba',
+        'PASSWORD': 'prueba1',
         'HOST': 'localhost',
-        'PORT': '5433'
+        'PORT': '5432'
     }
 }
 

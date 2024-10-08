@@ -1,8 +1,8 @@
 from django.urls import path
 
-from core.reports.views import ReportSaleView
+from core.reports.views import ReportPosteView
 
 urlpatterns = [
     # reports
-    path('sale/', ReportSaleView.as_view(), name='sale_report'),
+    path('postes/', ReportPosteView.as_view(), name='postes_report'),
 ]

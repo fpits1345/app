@@ -4,16 +4,14 @@ from django.http import JsonResponse
 from core.reports.forms import ReportForm
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
-from core.erp.models import Sale
-from django.db.models import Sum , DecimalField
-from django.db.models.functions import Coalesce 
-from django.contrib.auth.decorators import permission_required
-from core.erp.mixins import ValidatePermissionRequiredMixin
+from core.erp.models import Poste
+from django.db.models import Sum, DecimalField
+from django.db.models.functions import Coalesce
 from django.contrib.auth.mixins import LoginRequiredMixin
+from core.erp.mixins import ValidatePermissionRequiredMixin
 
-
-class ReportSaleView(TemplateView,LoginRequiredMixin, ValidatePermissionRequiredMixin,):
-    template_name = 'sale/report.html'
+class ReportPosteView(LoginRequiredMixin, TemplateView, ValidatePermissionRequiredMixin):
+    template_name = 'postes/report.html'
     permission_required = 'view_report'
 
     @method_decorator(csrf_exempt)
@@ -25,38 +23,38 @@ class ReportSaleView(TemplateView,LoginRequiredMixin, ValidatePermissionRequired
         try:
             action = request.POST['action']
             if action == 'search_report':
-                data = []
-                start_date = request.POST.get('start_date', '')
-                end_date = request.POST.get('end_date','')
-                search = Sale.objects.all()
-                
-                if len(start_date) and len(end_date):
-                    search = search.filter(date_joined__range=[start_date, end_date])
+                data = {
+                    'proyecto': {},
+                    'postes': []
+                }
+                proyecto_id = request.POST.get('proyecto_id', '')
+                search = Poste.objects.all()
 
-                for s in search:
-                    data.append([
-                        s.id,
-                        s.cli.username,
-                        s.date_joined.strftime('%Y-%m-%d'),
-                        format(s.subtotal, '2f'),
-                        format(s.iva, '2f'),
-                        format(s.total, '2f'),
+                if proyecto_id:
+                    search = search.filter(proyecto_id=proyecto_id)
+                    # Obtenemos la información del proyecto
+                    proyecto = search.first().proyecto if search.exists() else None
+
+                    if proyecto:
+                        data['proyecto'] = {
+                            'name': proyecto.name,
+                            'contacto': proyecto.contacto,
+                            'mail': proyecto.mail,
+                            'direccion': proyecto.direccion,
+                            'desc': proyecto.desc
+                        }
+
+                for p in search:
+                    data['postes'].append([
+                        p.id,
+                        p.name,
+                        p.proyecto.name if p.proyecto else 'Sin proyecto',
+                        p.tipo_poste.name,
+                        p.tipo_cruceta.name,
+                        p.tipo_abrazadera.name,
+                        p.latitud,
+                        p.longitud,
                     ])
-
-                subtotal = search.aggregate(r=Coalesce(Sum('subtotal'), 0, output_field=DecimalField())).get('r')
-                iva = search.aggregate(r=Coalesce(Sum('iva'), 0, output_field=DecimalField())).get('r')
-                total = search.aggregate(r=Coalesce(Sum('total'), 0, output_field=DecimalField())).get('r')
-
-                data.append([
-
-                    '---',
-                    '---',
-                    '---',
-                    format(subtotal, '2f'),
-                    format(iva, '2f'),
-                    format(total, '2f'),
-
-                ])
 
             else:
                 data['error'] = 'Ha ocurrido un error'
@@ -64,12 +62,10 @@ class ReportSaleView(TemplateView,LoginRequiredMixin, ValidatePermissionRequired
             data['error'] = str(e)
         return JsonResponse(data, safe=False)
 
-
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['title'] = 'Reporte de Movimientos'
-        context['entity'] = 'Reportes'
-        context['list_url'] = reverse_lazy('sale_report')
+        context['title'] = 'Reporte de Postes'
+        context['entity'] = 'Postes'
+        context['list_url'] = reverse_lazy('postes_report')
         context['form'] = ReportForm()
         return context
-

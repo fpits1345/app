@@ -1,3 +1,4 @@
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import JsonResponse
 from django.urls import reverse_lazy
@@ -38,7 +39,7 @@ class ProveedorListView(LoginRequiredMixin, ValidatePermissionRequiredMixin, Lis
         context['title'] = 'Listado de Proveedores'
         context['create_url'] = reverse_lazy('erp:proveedor_create')
         context['list_url'] = reverse_lazy('erp:proveedor_list')
-        context['entity'] = 'Proveedores'
+        context['entity'] = 'Proveedor'
         return context
 
 
@@ -68,8 +69,8 @@ class ProveedorCreateView(LoginRequiredMixin, ValidatePermissionRequiredMixin, C
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['title'] = 'Creación un Proveedor'
-        context['entity'] = 'Proveedores'
+        context['title'] = 'Creación de un proveedor'
+        context['entity'] = 'Proveedor'
         context['list_url'] = self.success_url
         context['action'] = 'add'
         return context
@@ -102,8 +103,8 @@ class ProveedorUpdateView(LoginRequiredMixin, ValidatePermissionRequiredMixin, U
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['title'] = 'Edición un Proveedor'
-        context['entity'] = 'Proveedores'
+        context['title'] = 'Edición de un Proveedor'
+        context['entity'] = 'Proveedor'
         context['list_url'] = self.success_url
         context['action'] = 'edit'
         return context
@@ -116,6 +117,7 @@ class ProveedorDeleteView(LoginRequiredMixin, ValidatePermissionRequiredMixin, D
     permission_required = 'delete_proveedor'
     url_redirect = success_url
 
+    @method_decorator(login_required)
     def dispatch(self, request, *args, **kwargs):
         self.object = self.get_object()
         return super().dispatch(request, *args, **kwargs)
@@ -131,6 +133,6 @@ class ProveedorDeleteView(LoginRequiredMixin, ValidatePermissionRequiredMixin, D
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['title'] = 'Eliminación de un Proveedor'
-        context['entity'] = 'Proveedores'
+        context['entity'] = 'Proveedor'
         context['list_url'] = self.success_url
         return context

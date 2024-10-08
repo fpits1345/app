@@ -15,7 +15,7 @@ class User(AbstractUser):
         return '{}{}'.format(STATIC_URL, 'img/empty.png')
 
     def toJSON(self):
-        item = model_to_dict(self, exclude = ['password', 'user_permissions', 'last_login'])
+        item = model_to_dict(self, exclude=['password', 'user_permissions', 'last_login'])
         if self.last_login:
             item['last_login'] = self.last_login.strftime('%Y-%m-%d')
         item['date_joined'] = self.date_joined.strftime('%Y-%m-%d')
@@ -30,7 +30,17 @@ class User(AbstractUser):
             request = get_current_request()
             groups = self.groups.all()
             if groups.exists():
-                if 'group' not in request.session:
-                    request.session['group'] = groups[0]
+                if 'group_id' not in request.session:
+                    request.session['group_id'] = groups[0].id
         except:
             pass
+
+    def get_group_from_session(self):
+        try:
+            request = get_current_request()
+            group_id = request.session.get('group_id')
+            if group_id:
+                return self.groups.get(id=group_id)
+            return None
+        except:
+            return None

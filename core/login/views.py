@@ -11,11 +11,24 @@ import config.settings as setting
 
 class LoginFormView(LoginView):
     template_name = 'login.html'
+    form_class = AuthenticationForm
 
     def dispatch(self, request, *args, **kwargs):
         if request.user.is_authenticated:
             return redirect(setting.LOGIN_REDIRECT_URL)
         return super().dispatch(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        # Llama a la implementación por defecto
+        response = super().form_valid(form)
+        
+        # Agrega el grupo del usuario a la sesión
+        user = form.get_user()
+        if user.groups.exists():
+            group = user.groups.first()
+            self.request.session['group_id'] = group.id  # O usa group.id si prefieres almacenar el ID
+        
+        return response
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

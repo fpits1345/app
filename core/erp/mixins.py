@@ -11,7 +11,7 @@ class IsSuperuserMixin(object):
     def dispatch(self, request, *args, **kwargs):
         if request.user.is_superuser:
             return super().dispatch(request, *args, **kwargs)
-        return redirect('index')
+        return redirect('')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -42,12 +42,14 @@ class ValidatePermissionRequiredMixin(object):
         messages.error(request, 'No tiene permiso para ingresar a este módulo')
         return HttpResponseRedirect(self.get_url_redirect())"""
 
+from django.contrib.auth.models import Group
+
 class ValidatePermissionRequiredMixin(object):
     permission_required = ''
     url_redirect = None
 
     def get_perms(self):
-        perms = []  # Declarar perms como una lista vacía
+        perms = []  # Inicializar perms como una lista vacía
         if isinstance(self.permission_required, str):
             perms.append(self.permission_required)
         else:
@@ -60,19 +62,24 @@ class ValidatePermissionRequiredMixin(object):
         return self.url_redirect
 
     def dispatch(self, request, *args, **kwargs):
-        request = get_current_request()
-
         if request.user.is_superuser:
             return super().dispatch(request, *args, **kwargs)
 
-        if 'group' in request.session:
-            group = request.session['group']
-            perms = self.get_perms()  # Asignar perms antes de utilizarlo
-            for p in perms:
-                if not group.permissions.filter(codename=p).exists():
-                    messages.error(request, 'No tiene permiso para ingresar a este módulo')
-                    return HttpResponseRedirect(self.get_url_redirect())
+        group_id = request.session.get('group_id')
+        if group_id:
+            try:
+                group = Group.objects.get(id=group_id)
+                perms = self.get_perms()
+                for p in perms:
+                    has_permission = group.permissions.filter(codename=p).exists()
+                    if not has_permission:
+                        messages.error(request, 'No tiene permiso para ingresar a este módulo')
+                        return HttpResponseRedirect(self.get_url_redirect())
 
-            return super().dispatch(request, *args, **kwargs)
-        messages.error(request, 'No tiene permiso para ingresar a este módulo')
+                return super().dispatch(request, *args, **kwargs)
+            except Group.DoesNotExist:
+                messages.error(request, 'Grupo no encontrado en la base de datos.')
+        else:
+            messages.error(request, 'No se encontró un grupo en la sesión.')
+
         return HttpResponseRedirect(self.get_url_redirect())

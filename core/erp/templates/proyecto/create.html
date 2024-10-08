@@ -1,0 +1,143 @@
+{% extends 'layout.html' %}
+{% load widget_tweaks %}
+{% block head %}
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    
+    <!-- CSS de Select2 -->
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-beta.1/dist/css/select2.min.css" rel="stylesheet" />
+
+    {% block head_form %}
+    {% endblock %}
+{% endblock %}
+
+{% block content %}
+    <form method="post" action="." enctype="multipart/form-data">
+        <div class="card card-primary">
+            <div class="card-header">
+                <h3 class="card-title">
+                    {% if action == 'add' %}
+                        <i class="fas fa-plus"></i>
+                    {% else %}
+                        <i class="fas fa-edit"></i>
+                    {% endif %}
+                    {{ title }}
+                </h3>
+            </div>
+            <div class="card-body">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="{{ action }}">
+                {% if form.errors %}
+                    <div class="alert alert-danger alert-dismissible">
+                        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                        <h5><i class="icon fas fa-ban"></i> Ha ocurrido un error al querer guardar el registro</h5>
+                        <ul>
+                            {% for field in form %}
+                                {% for error in field.errors %}
+                                    <li>{{ error }}</li>
+                                {% endfor %}
+                            {% endfor %}
+                        </ul>
+                    </div>
+                {% endif %}
+                
+                <!-- Estructura de dos columnas -->
+                <div class="row">
+                    <div class="col-md-6">
+                        <!-- Primera columna -->
+                        <div class="form-group">
+                            <label for="{{ form.name.id_for_label }}">{{ form.name.label }}:</label>
+                            {{ form.name|add_class:'form-control'|attr:'autocomplete:off' }}
+                        </div>
+                        <div class="form-group">
+                            <label for="{{ form.contacto.id_for_label }}">{{ form.contacto.label }}:</label>
+                            {{ form.contacto|add_class:'form-control'|attr:'autocomplete:off' }}
+                        </div>
+                        <div class="form-group">
+                            <label for="{{ form.mail.id_for_label }}">{{ form.mail.label }}:</label>
+                            {{ form.mail|add_class:'form-control'|attr:'autocomplete:off' }}
+                        </div>
+                        <div class="form-group">
+                            <label for="{{ form.direccion.id_for_label }}">{{ form.direccion.label }}:</label>
+                            {{ form.direccion|add_class:'form-control'|attr:'autocomplete:off' }}
+                        </div>
+                       
+                        <div class="form-group">
+                            <label for="{{ form.desc.id_for_label }}">{{ form.desc.label }}:</label>
+                            {{ form.desc|add_class:'form-control'|attr:'autocomplete:off' }}
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <!-- Segunda columna -->
+                        <div class="form-group">
+                            <label for="{{ form.direccion.id_for_label }}">{{ form.proveedor.label }}:</label>
+                            {{ form.proveedor|add_class:'form-control'|attr:'autocomplete:off' }}
+                        </div>
+                        <div class="form-group">
+                            <label for="{{ form.soti.id_for_label }}">{{ form.soti.label }}:</label>
+                            {{ form.soti|add_class:'form-control'|attr:'autocomplete:off' }}
+                        </div>
+                        <div class="form-group">
+                            <label for="{{ form.shaft.id_for_label }}">{{ form.shaft.label }}:</label>
+                            {{ form.shaft|add_class:'form-control'|attr:'autocomplete:off' }}
+                        </div>
+                        <div class="form-group">
+                            <label for="{{ form.cant_departamentos.id_for_label }}">{{ form.cant_departamentos.label }}:</label>
+                            {{ form.cant_departamentos|add_class:'form-control'|attr:'autocomplete:off' }}
+                        </div>
+                        <div class="form-group">
+                            <label for="{{ form.cant_casas.id_for_label }}">{{ form.cant_casas.label }}:</label>
+                            {{ form.cant_casas|add_class:'form-control'|attr:'autocomplete:off' }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer">
+                <button type="submit" class="btn btn-primary btn-flat">
+                    <i class="fas fa-save"></i> Guardar registro
+                </button>
+                <a href="{{ list_url }}" class="btn btn-danger btn-flat">
+                    <i class="fas fa-times"></i> Cancelar
+                </a>
+            </div>
+        </div>
+    </form>
+    <script>
+
+        {% if form.errors %}
+            var errors = '';
+            {% for field in form %}
+                {% for error in field.errors %}
+                    errors += '{{ error }}\n';
+                {% endfor %}
+            {% endfor %}
+            {% for error in form.non_field_errors %}
+                errors += '{{ error }}\n';
+            {% endfor %}
+            Swal.fire({
+                title: 'Error!',
+                text: errors,
+                icon: 'error'
+            });
+        {% endif %}
+
+        // Inicialización de Select2
+        $(document).ready(function() {
+            $('.select2').select2({
+                width: 'resolve'  // Ajusta el ancho al del contenedor padre
+            });
+        });
+
+        $('form').on('submit', function (e) {
+            e.preventDefault();
+            var parameters = new FormData(this);
+            submit_with_ajax(window.location.pathname, 'Notificación', '¿Estas seguro de realizar la siguiente acción?', parameters, function () {
+                location.href = '{{ list_url }}';
+            });
+        });
+
+    </script>
+    <!-- JavaScript de Select2 -->
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-beta.1/dist/js/select2.min.js"></script>
+{% endblock %}

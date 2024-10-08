@@ -15,7 +15,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from core.homepage.views import IndexView
+
 from core.login.views import *
 from core.user.views import *
 
@@ -23,8 +23,9 @@ from django.conf import settings
 from django.conf.urls.static import static
 
 urlpatterns = [
-    path('', IndexView.as_view(), name='index'),
+    #path('', IndexView.as_view(), name='index'),
     path('login/', include('core.login.urls')),
+    path('', include('core.login.urls')),
     path('admin/', admin.site.urls),
     path('erp/', include('core.erp.urls')),
     path('reports/', include('core.reports.urls')),

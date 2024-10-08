@@ -41,7 +41,6 @@ INSTALLED_APPS = [
     'widget_tweaks',
     # Apps
     'core.erp',
-    'core.homepage',
     'core.login',
     'core.user',
     'core.reports',
@@ -138,5 +137,6 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = 'user.User'
 
-SESSION_SERIALIZER = 'django.contrib.sessions.serializers.PickleSerializer'
+#SESSION_SERIALIZER = 'django.contrib.sessions.serializers.PickleSerializer'
 
+SESSION_SERIALIZER = 'django.contrib.sessions.serializers.JSONSerializer'
