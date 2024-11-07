@@ -1,0 +1,144 @@
+{% extends 'layout.html' %}
+{% load widget_tweaks %}
+{% block head %}
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    {% block head_form %}
+    {% endblock %}
+{% endblock %}
+
+{% block content %}
+    <form method="post" action="." enctype="multipart/form-data">
+        <div class="card card-primary">
+            <div class="card-header">
+                <h3 class="card-title">
+                    {% if action == 'add' %}
+                        <i class="fas fa-plus"></i>
+                    {% else %}
+                        <i class="fas fa-edit"></i>
+                    {% endif %}
+                    {{ title }}
+                </h3>
+            </div>
+            <div class="card-body">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="{{ action }}">
+                {% if form.errors %}
+                    <div class="alert alert-danger alert-dismissible">
+                        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                        <h5><i class="icon fas fa-ban"></i> Ha ocurrido un error al querer guardar el registro</h5>
+                        <ul>
+                            {% for field in form %}
+                                {% for error in field.errors %}
+                                    <li>{{ error }}</li>
+                                {% endfor %}
+                            {% endfor %}
+                        </ul>
+                    </div>
+                {% endif %}
+                
+                {% for field in form.visible_fields %}
+                    <div class="form-group">
+                        <label for="{{ field.id_for_label }}">{{ field.label }}:</label>
+                        {{ field|add_class:'form-control'|attr:'autocomplete:off' }}
+                    </div>
+                {% endfor %}
+                
+                <button type="button" id="get-location-btn" class="btn btn-primary">Obtener ubicación actual</button>
+
+                <!-- Mapa -->
+                <div id="map" style="height: 400px; margin-top: 20px;"></div>
+                
+            </div>
+            <div class="card-footer">
+                <button type="submit" class="btn btn-primary btn-flat">
+                    <i class="fas fa-save"></i> Guardar registro
+                </button>
+                <a href="{{ list_url }}" class="btn btn-danger btn-flat">
+                    <i class="fas fa-times"></i> Cancelar
+                </a>
+            </div>
+        </div>
+    </form>
+    <script>
+        // Inicializar el mapa
+        // Inicializar el mapa
+var map = L.map('map').setView([-33.4489, -70.6693], 13); // Coordenadas iniciales
+
+// Agregar capa de mapa base
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19,
+}).addTo(map);
+
+// Marcador para la ubicación actual
+var marker;
+
+// Función para actualizar la ubicación
+function updateLocation(position) {
+    var lat = position.coords.latitude;
+    var lon = position.coords.longitude;
+
+    // Actualizar campos de formulario
+    document.getElementById('id_latitud').value = lat;
+    document.getElementById('id_longitud').value = lon;
+
+    // Actualizar el marcador en el mapa
+    if (marker) {
+        map.removeLayer(marker);
+    }
+    marker = L.marker([lat, lon]).addTo(map);
+    map.setView([lat, lon], 15); // Ajustar el zoom y centrar en la ubicación
+}
+
+// Solicitar la ubicación continuamente cuando la página se carga
+if (navigator.geolocation) {
+    navigator.geolocation.watchPosition(updateLocation, function(error) {
+        alert('Error al obtener la ubicación: ' + error.message);
+    }, {
+        enableHighAccuracy: true,
+        timeout: 5000, // Tiempo de espera antes de reintentar
+        maximumAge: 0 // No usar ubicaciones en caché
+    });
+} else {
+    alert('La geolocalización no es compatible con este navegador.');
+}
+
+// También actualizar la ubicación cuando se presiona el botón
+document.getElementById('get-location-btn').addEventListener('click', function() {
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(updateLocation, function(error) {
+            alert('Error al obtener la ubicación: ' + error.message);
+        }, {
+            enableHighAccuracy: true
+        });
+    } else {
+        alert('La geolocalización no es compatible con este navegador.');
+    }
+});
+
+{% if form.errors %}
+    var errors = '';
+    {% for field in form %}
+        {% for error in field.errors %}
+            errors += '{{ error }}\n';
+        {% endfor %}
+    {% endfor %}
+    {% for error in form.non_field_errors %}
+        errors += '{{ error }}\n';
+    {% endfor %}
+    Swal.fire({
+        title: 'Error!',
+        text: errors,
+        icon: 'error'
+    });
+{% endif %}
+
+$('form').on('submit', function (e) {
+    e.preventDefault();
+    var parameters = new FormData(this);
+    submit_with_ajax(window.location.pathname, 'Notificación', '¿Estas seguro de realizar la siguiente acción?', parameters, function () {
+        location.href = '{{ list_url }}';
+    });
+});
+    </script>
+{% endblock %}

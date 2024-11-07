@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Reporte</title>
+    <style>
+        .img-invoice {
+            width: 50px;
+            text-align: center;
+            margin: 0 auto;
+        }
+
+        .head {
+            text-align: center;
+            text-transform: uppercase;
+        }
+
+        #invoice thead tr th {
+            text-align: left;
+            border-bottom: 1px solid black;
+            border-top: 1px solid black;
+            padding-top: 4px;
+        }
+
+        #invoice thead tr {
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        #invoice tbody tr {
+            padding: 0;
+        }
+
+        .text-center{
+            text-align: center;
+        }
+        .title {
+            text-align: center;
+            font-size: 24px;
+        }
+
+        .title-line {
+            border-top: 1px solid black;
+            margin: 10px auto;
+            width: 50%;
+        }
+
+
+         /* Estilos para la tabla de diseño (rectángulos) */
+         .design-table, .design-table th, .design-table td {
+            border: 1px solid black; /* Aplica bordes a todas las celdas de la tabla de diseño */
+        }
+
+        /* Encabezado en la esquina superior derecha */
+        .header-right {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 15px; 
+            text-align: right;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Encabezado en la esquina superior derecha -->
+<div class="header-right">
+    IN-RXX
+</div>
+
+<div class="title">
+    Registro de entrega de proyecto
+</div>
+<hr class="title-line">
+<br>
+
+
+<p>
+    <b>Proyecto:</b> {{ proyecto.name }}<br>
+    <b>Dirección:</b> {{ proyecto.direccion }}<br>
+    <b>Administrador:</b> {{ proyecto.adm }}<br>
+    <b>Contacto:</b> {{ proyecto.contacto }}<br>
+    <b>Mail:</b> {{ proyecto.mail }}<br>
+    
+</p>
+
+<!-- Información de diseño invertida -->
+{% if diseno %}
+<h3 class="text-center">Planta externa e interna</h3> <!-- Título de la tabla -->
+<table class="design-table">
+    <tbody>
+        <tr>
+            <th style="width: 20%;">OLT</th>
+            <td class="text-center" style="padding: 3px 0;">{{ diseno.olt }}</td>
+        </tr>
+        <tr>
+            <th>ODF</th>
+            <td class="text-center" style="padding: 3px 0;">{{ diseno.odf }}</td>
+        </tr>
+        <tr>
+            <th>Hilo</th>
+            <td class="text-center" style="padding: 3px 0;">{{ diseno.hilo }}</td>
+        </tr>
+        <tr>
+            <th>Slot</th>
+            <td class="text-center" style="padding: 3px 0;">{{ diseno.slot }}</td>
+        </tr>
+        <tr>
+            <th>PON</th>
+            <td class="text-center" style="padding: 3px 0;">{{ diseno.pon }}</td>
+        </tr>
+    </tbody>
+</table>
+{% else %}
+<p>No se encontró información de diseño.</p>
+{% endif %}
+
+<br>
+
+
+{% if diseno %}
+<h3 class="text-center">Distribución</h3> <!-- Título de la tabla -->
+<table class="design-table">
+    <tbody>
+        <tr>
+            <th style="width: 20%;">Cantidad NAP 8</th>
+            <td class="text-center" style="padding: 3px 0;">{{ diseno.nap8 }}</td>
+        </tr>
+        <tr>
+            <th>Cantidad NAP 16</th>
+            <td class="text-center" style="padding: 3px 0;">{{ diseno.nap16 }}</td>
+        </tr>
+        <tr>
+            <th>Cantidad M1</th>
+            <td class="text-center" style="padding: 3px 0;">{{ diseno.m1 }}</td>
+        </tr>
+        <tr>
+            <th>Cantidad mufa m2</th>
+            <td class="text-center" style="padding: 3px 0;">{{ diseno.m2 }}</td>
+        </tr>
+        <tr>
+            <th>splitter de 8</th>
+            <td class="text-center" style="padding: 3px 0;">{{ diseno.sp8 }}</td>
+        </tr>
+
+        <tr>
+            <th>splitter de 16</th>
+            <td class="text-center" style="padding: 3px 0;">{{ diseno.sp16 }}</td>
+        </tr>
+
+        <tr>
+            <th>ODF</th>
+            <td class="text-center" style="padding: 3px 0;">{{ diseno.odf1 }}</td>
+        </tr>
+
+        <tr>
+            <th>ODF</th>
+            <td class="text-center" style="padding: 3px 0;">{{ diseno.odf2 }}</td>
+        </tr>
+
+        <tr>
+            <th>ODF</th>
+            <td class="text-center" style="padding: 3px 0;">{{ diseno.odf3 }}</td>
+        </tr>
+
+    </tbody>
+</table>
+{% else %}
+<p>No se encontró información de diseño.</p>
+{% endif %}
+
+<br>
+
+{% if diseno %}
+<h3 class="text-center">Detalle</h3> <!-- Título de la tabla -->
+<table class="design-table">
+    <tbody>
+        <tr>
+            <th style="width: 20%;">HP</th>
+            <td class="text-center" style="padding: 3px 0;">{{ diseno.hp }}</td>
+        </tr>
+        
+    </tbody>
+</table>
+{% else %}
+<p>No se encontró información de diseño.</p>
+{% endif %}
+
+<br>
+
+
+{% if diseno %}
+<h3 class="text-center">Observaciones de proyecto</h3> <!-- Título de la tabla -->
+<table class="design-table">
+    <tbody>
+        <tr>
+            
+            <td class="text-center" style="padding: 3px 0;">{{ diseno.obs }}</td>
+        </tr>
+        
+    </tbody>
+</table>
+{% else %}
+<p>No se encontró información de diseño.</p>
+{% endif %}
+
+<br>
+
+
+
+<!-- Listado de postes -->
+<h3 class="text-center">Listado de postaciones</h3>
+<table id="invoice">
+    <thead>
+        <tr>
+            <th style="width: 10%;">ID</th>
+            <th style="width: 20%;">Nombre</th>
+            <th style="width: 10%;">Tipo</th>
+            <th style="width: 15%;">Cruceta</th>
+            <th style="width: 15%;">Abrazadera</th>
+            <th style="width: 15%;">Latitud</th>
+            <th style="width: 15%;">Longitud</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for poste in postes %}
+            <tr>
+                <td class="text-center" style="padding: 3px 0;">{{ poste.id }}</td>
+                <td>{{ poste.name }}</td>
+                <td>{{ poste.tipo_poste.name }}</td>
+                <td>{{ poste.tipo_cruceta.name }}</td>
+                <td>{{ poste.tipo_abrazadera.name }}</td>
+                <td>{{ poste.latitud }}</td>
+                <td>{{ poste.longitud }}</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<p><br></p>
+
+<table style="margin-top: 250px;">
+    <thead>
+        <tr>
+            <th>****Registro interno****</th>
+        </tr>
+    </thead>
+</table>
+
+</body>
+</html>

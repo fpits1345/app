@@ -1,0 +1,24 @@
+{% extends 'list.html' %}
+{% load static %}
+{% block head_list %}
+    <script src="{% static 'diseno/js/list.js' %}"></script>
+{% endblock %}
+
+{% block columns %}
+    <tr>
+        <th scope="col" style="width: 10%;">id</th>
+        <th scope="col" style="width: 20%;">Proyecto</th>
+      
+        <th scope="col" style="width: 25%;">olt</th>
+        <th scope="col" style="width: 15%;">odf</th>
+        <th scope="col" style="width: 15%;">hilos</th>
+        <th scope="col" style="width: 15%;">hp</th>
+    
+        
+        <th scope="col" style="width: 25%;">Opciones</th>
+    </tr>
+{% endblock %}
+
+{% block javascript %}
+
+{% endblock javascript %}
